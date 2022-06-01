@@ -14,11 +14,11 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from models import storage
 import json
 import os
 import pep8
 import unittest
+from models import storage
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -48,46 +48,25 @@ test_db_storage.py'])
 
     def test_db_storage_module_docstring(self):
         """Test for the db_storage.py module docstring"""
-        self.assertIsNot(db_storage.__doc__, None,
+        self.assertIsNot(db_storage._doc_, None,
                          "db_storage.py needs a docstring")
-        self.assertTrue(len(db_storage.__doc__) >= 1,
+        self.assertTrue(len(db_storage._doc_) >= 1,
                         "db_storage.py needs a docstring")
 
     def test_db_storage_class_docstring(self):
         """Test for the DBStorage class docstring"""
-        self.assertIsNot(DBStorage.__doc__, None,
+        self.assertIsNot(DBStorage._doc_, None,
                          "DBStorage class needs a docstring")
-        self.assertTrue(len(DBStorage.__doc__) >= 1,
+        self.assertTrue(len(DBStorage._doc_) >= 1,
                         "DBStorage class needs a docstring")
 
     def test_dbs_func_docstrings(self):
         """Test for the presence of docstrings in DBStorage methods"""
         for func in self.dbs_f:
-            self.assertIsNot(func[1].__doc__, None,
+            self.assertIsNot(func[1]._doc_, None,
                              "{:s} method needs a docstring".format(func[0]))
-            self.assertTrue(len(func[1].__doc__) >= 1,
+            self.assertTrue(len(func[1]._doc_) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
-
-    def test_dbs_func_get(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        first_state_id = list(storage.all("State").values())
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", state.id), id1)
-
-    def test_dbs_func_count(self):
-        """Test for the presence of docstrings in DBStorage methods"""
-        num1 = storage.count("State")
-        state = State(name="yesid")
-        storage.new(state)
-        storage.save()
-        num2 = storage.count("State")
-        first_state_id = list(storage.all("State").values())[0].id
-        id1 = first_state_id
-        self.assertTrue(storage.get("State", first_state_id), id1)
-        self.assertTrue(num1 + 1, num2)
 
 
 class TestFileStorage(unittest.TestCase):
@@ -107,4 +86,25 @@ class TestFileStorage(unittest.TestCase):
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
-        """Test that save properly saves objects to file.json"""
+        """To test if save property saves objects to file.json"""
+
+    def test_get_db(self):
+        """ Tests for obtaining an instance db storage"""
+        dic = {"name": "Cundinamarca"}
+        instance = State(**dic)
+        storage.new(instance)
+        storage.save()
+        get_instance = storage.get(State, instance.id)
+        self.assertEqual(get_instance, instance)
+
+    def test_count(self):
+        """ Tests for checking the count method db storage """
+        dic = {"name": "Vecindad"}
+        state = State(**dic)
+        storage.new(state)
+        dic = {"name": "Mexico", "state_id": state.id}
+        city = City(**dic)
+        storage.new(city)
+        storage.save()
+        c = storage.count()
+        self.assertEqual(len(storage.all()), c)
